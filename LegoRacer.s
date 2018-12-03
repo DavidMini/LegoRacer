@@ -8,7 +8,7 @@
 .equ  TIMER0_PERIODH,   12
 .equ  TIMER0_SNAPL,     16
 .equ  TIMER0_SNAPH,     20
-.equ TICKS_PER_SEC, 10
+.equ TICKS_PER_SEC, 1500000
 
 .text
 .global _start
@@ -116,7 +116,7 @@ forward:
   movia  r11, 0xffdfff0
   stwio  r11, 0(r8)
 
-call pwm
+ call pwm
  #CHECK FOR VALID BIT!!!!!
   movia r14, PS2_BASE
   ldwio r12, 0(r14)
@@ -245,10 +245,16 @@ pwm:
     call initialize_timer
     call start_timer_once
 
-check_time:
-	call read_timer
-    bne r2, r0, check_time
-    call stop_timer
+onesec:
+	movia r8, TIMER0_BASE
+	ldwio r17, TIMER0_STATUS(r8)
+	andi r17, r17, 0x1
+	
+	beq r17, r0, onesec
+	movi r17, 0x0
+	stwio r17, TIMER0_STATUS(r8)
+    
+    
     ldw ra, 0(sp)
     ldw r8, 4(sp)
     ldw r9, 8(sp)
