@@ -21,6 +21,58 @@ _start:
   movia r9, 0xffffffff        # disable motors
   stwio r9, 0(r8)
 
+  # --------------------------------
+  # merge here ---------------------
+  
+  
+  
+  movia  r8, ADDR_JP2         # load address GPIO JP2 into r8
+  movia  r9, 0x07f557ff       # set motor,threshold and sensors bits to output, set state and sensor valid bits to inputs 
+  stwio  r9, 4(r8)
+
+
+  # load sensors 0-3 setting their thresholds and enabling the sensor
+  # sensor 0
+  movia  r9,  0xffbffbff       # set motors off and enable threshold load sensor 0
+  stwio  r9,  0(r8)            
+  movia  r9,  0xfafffff       # disable threshold register and enable state mode
+  stwio  r9,  0(r8)
+
+  # sensor 1
+  movia  r9,  0xffbfefff       
+  stwio  r9,  0(r8)            
+  movia  r9,  0xfaffffff       
+  stwio  r9,  0(r8)
+
+  # sensor 2
+  movia  r9,  0xfabfbfff       
+  stwio  r9,  0(r8)            
+  movia  r9,  0xfaffffff       
+  stwio  r9,  0(r8)
+
+  # sensor 3
+  movia  r9,  0xfabeffff       
+  stwio  r9,  0(r8)            
+  movia  r9,  0xfaffffff       
+  stwio  r9,  0(r8)
+
+  # enable interrupts
+
+  movia  r12, 0x78000000       # enable interrupts on sensor (3) - 0x40000000 originally
+  stwio  r12, 8(r8)
+
+  movia  r8, ADDR_JP2_IRQ    # enable interrupt for GPIO JP2 (IRQ12) 
+  wrctl  ctl3, r8
+
+  movia  r8, 1
+  wrctl  ctl0, r8            # enable global interrupts
+
+
+
+  # -------------------------------------
+  # merge here -------------------------
+
+
   # enable interrupts
   movi r9, 0x1
   wrctl status, r9
